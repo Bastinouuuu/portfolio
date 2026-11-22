@@ -1,27 +1,29 @@
-import { profile, skills, projects } from './data.js'
+import { profile, skills, experience, education, projects } from './data.js'
 
 export default function App() {
-  const marquee = [...skills, ...skills]
+  const marquee = [...skills, ...skills, ...skills, ...skills]
+  const contact = profile.email ? `mailto:${profile.email}` : profile.linkedin
   return (
     <>
       <header className="nav">
         <a className="brand" href="#top">{profile.name}</a>
         <nav>
           <a href="#about">À propos</a>
-          <a href="#projects">Réalisations</a>
+          <a href="#experience">Parcours</a>
+          {projects.length > 0 && <a href="#projects">Réalisations</a>}
           <a href="#contact">Contact</a>
         </nav>
-        <a className="btn btn-sm" href={`mailto:${profile.email}`}>Me contacter</a>
+        <a className="btn btn-sm" href={contact}>Me contacter</a>
       </header>
 
       <main id="top">
         <section className="hero">
-          <span className="pill"><i className="dot" />Disponible maintenant</span>
+          <span className="pill"><i className="dot" />{profile.location}</span>
           <h1 className="rise">{profile.title}</h1>
           <p className="lead rise d1">{profile.bio}</p>
           <div className="actions rise d2">
-            <a className="btn" href="#projects">Voir mes projets</a>
-            <a className="btn btn-ghost" href={profile.github}>GitHub</a>
+            <a className="btn" href="#experience">Voir mon parcours</a>
+            <a className="btn btn-ghost" href={profile.linkedin}>LinkedIn</a>
           </div>
         </section>
 
@@ -37,8 +39,40 @@ export default function App() {
           </ul>
         </section>
 
+        <section id="experience">
+          <p className="eyebrow">02 — Parcours</p>
+          <h2>Expérience et formation.</h2>
+          <div className="cols">
+            <div>
+              <h3 className="sub">Expérience</h3>
+              <ol className="timeline">
+                {experience.map((e) => (
+                  <li key={e.role + e.period}>
+                    <span className="when">{e.period}</span>
+                    <strong>{e.role}</strong>
+                    <span>{e.company} · {e.type} · {e.place}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+            <div>
+              <h3 className="sub">Formation</h3>
+              <ol className="timeline">
+                {education.map((e) => (
+                  <li key={e.degree + e.period}>
+                    <span className="when">{e.period}</span>
+                    <strong>{e.degree}</strong>
+                    <span>{e.school}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </div>
+        </section>
+
+        {projects.length > 0 && (
         <section id="projects">
-          <p className="eyebrow">02 — Réalisations</p>
+          <p className="eyebrow">03 — Réalisations</p>
           <h2>Quelques projets récents.</h2>
           <div className="grid">
             {projects.map((p, i) => (
@@ -52,11 +86,12 @@ export default function App() {
             ))}
           </div>
         </section>
+        )}
 
         <section id="contact" className="cta">
-          <p className="eyebrow">03 — Contact</p>
+          <p className="eyebrow">04 — Contact</p>
           <h2>Un projet en tête ? Parlons-en.</h2>
-          <a className="btn" href={`mailto:${profile.email}`}>{profile.email}</a>
+          <a className="btn" href={contact}>{profile.email || 'Me contacter sur LinkedIn'}</a>
           <p className="links"><a href={profile.github}>GitHub</a> · <a href={profile.linkedin}>LinkedIn</a></p>
         </section>
       </main>
