@@ -20,7 +20,7 @@ float noise(vec2 p){
 float fbm(vec2 p){
   float v = 0., a = .5;
   mat2 m = mat2(1.6,1.2,-1.2,1.6);
-  for(int i=0;i<5;i++){ v += a*noise(p); p = m*p; a *= .5; }
+  for(int i=0;i<4;i++){ v += a*noise(p); p = m*p; a *= .5; }
   return v;
 }
 
@@ -28,7 +28,7 @@ void main(){
   vec2 uv = gl_FragCoord.xy / uRes;
   float asp = uRes.x / uRes.y;
   vec2 p = (uv - .5) * vec2(asp, 1.) * 2.;
-  float t = uTime * .06;
+  float t = uTime * .09;
 
   // Le curseur tord le tissu : rotation locale autour de chaque point de la traînée.
   vec2 q0 = p;
@@ -104,10 +104,9 @@ export default function Liquid() {
     const trail = new Float32Array(TRAIL * 3)
     for (let i = 0; i < TRAIL; i++) trail[i * 3] = trail[i * 3 + 1] = -5
     let head = 0
-    const last = { x: 0.5, y: 0.5, set: false }
-
+    
     const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.5) // le shader est coûteux : on plafonne
+      const dpr = Math.min(window.devicePixelRatio || 1, 1) * 0.75 // rendu réduit : plus fluide, et le flou est voulu
       canvas.width = Math.floor(window.innerWidth * dpr)
       canvas.height = Math.floor(window.innerHeight * dpr)
       gl.viewport(0, 0, canvas.width, canvas.height)
@@ -115,26 +114,34 @@ export default function Liquid() {
     resize()
     window.addEventListener('resize', resize)
 
-    const push = (x, y) => {
-      const nx = x / window.innerWidth
-      const ny = 1 - y / window.innerHeight
-      if (last.set) {
-        const speed = Math.hypot(nx - last.x, ny - last.y)
-        trail[head * 3] = nx
-        trail[head * 3 + 1] = ny
-        trail[head * 3 + 2] = Math.min(speed * 18, 0.9)
-        head = (head + 1) % TRAIL
-      }
-      last.x = nx; last.y = ny; last.set = true
+    // Le pointeur est lissé et échantillonné à chaque frame : traînée continue, sans à-coups.
+    const target = { x: 0.5, y: 0.5, seen: false }
+    const smooth = { x: 0.5, y: 0.5 }
+    const setTarget = (x, y) => {
+      target.x = x / window.innerWidth
+      target.y = 1 - y / window.innerHeight
+      if (!target.seen) { smooth.x = target.x; smooth.y = target.y; target.seen = true }
     }
-    const onMove = (e) => push(e.clientX, e.clientY)
-    const onTouch = (e) => e.touches[0] && push(e.touches[0].clientX, e.touches[0].clientY)
+    const onMove = (e) => setTarget(e.clientX, e.clientY)
+    const onTouch = (e) => e.touches[0] && setTarget(e.touches[0].clientX, e.touches[0].clientY)
     window.addEventListener('pointermove', onMove)
     window.addEventListener('touchmove', onTouch, { passive: true })
 
     let raf, start = performance.now()
     const frame = (now) => {
-      for (let i = 0; i < TRAIL; i++) trail[i * 3 + 2] *= 0.955 // la torsion s'estompe
+      for (let i = 0; i < TRAIL; i++) trail[i * 3 + 2] *= 0.975 // la torsion s'estompe
+      if (target.seen) {
+        const px = smooth.x, py = smooth.y
+        smooth.x += (target.x - smooth.x) * 0.18
+        smooth.y += (target.y - smooth.y) * 0.18
+        const speed = Math.hypot(smooth.x - px, smooth.y - py)
+        if (speed > 0.0004) {
+          trail[head * 3] = smooth.x
+          trail[head * 3 + 1] = smooth.y
+          trail[head * 3 + 2] = Math.min(speed * 40, 0.9)
+          head = (head + 1) % TRAIL
+        }
+      }
       gl.uniform2f(uRes, canvas.width, canvas.height)
       gl.uniform1f(uTime, reduce ? 12 : (now - start) / 1000)
       gl.uniform3fv(uTrail, trail)

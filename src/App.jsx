@@ -7,9 +7,9 @@ const W = () => (typeof window === 'undefined' ? 1280 : window.innerWidth)
 const H = () => (typeof window === 'undefined' ? 800 : window.innerHeight)
 
 const wins = [
-  { id: 'about', title: 'about.txt', width: 400, pos: () => [W() * 0.08, H() * 0.14] },
-  { id: 'projects', title: 'projects/', width: 440, pos: () => [W() * 0.5, H() * 0.2] },
-  { id: 'contact', title: 'contact.sh', width: 360, pos: () => [W() * 0.3, H() * 0.55] },
+  { id: 'about', title: 'about.txt', width: 400, pos: () => [W() * 0.06, H() * 0.13] },
+  { id: 'projects', title: 'projects/', width: 440, pos: () => [Math.max(W() * 0.5, W() - 440 - W() * 0.05), H() * 0.13] },
+  { id: 'contact', title: 'contact.sh', width: 360, pos: () => [W() * 0.5 - 180, H() * 0.56] },
 ]
 
 const content = {
@@ -47,8 +47,8 @@ const content = {
 }
 
 export default function App() {
-  const [open, setOpen] = useState(() => ({ about: true, projects: true, contact: false }))
-  const [order, setOrder] = useState(['contact', 'projects', 'about']) // dernier = au-dessus
+  const [open, setOpen] = useState(() => ({ about: false, projects: false, contact: true }))
+  const [order, setOrder] = useState(['about', 'projects', 'contact']) // dernier = au-dessus
   const [pos] = useState(() => Object.fromEntries(wins.map((w) => [w.id, w.pos()])))
 
   const focus = (id) => setOrder((o) => [...o.filter((x) => x !== id), id])
