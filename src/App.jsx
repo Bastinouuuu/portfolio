@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import Liquid from './Liquid.jsx'
+import Background from './Background.jsx'
 import TermWindow from './TermWindow.jsx'
 import { profile, skills, projects } from './data.js'
 
@@ -47,7 +47,7 @@ const content = {
 }
 
 export default function App() {
-  const [open, setOpen] = useState(() => ({ about: false, projects: false, contact: true }))
+  const [open, setOpen] = useState(() => ({ about: true, projects: true, contact: true }))
   const [order, setOrder] = useState(['about', 'projects', 'contact']) // dernier = au-dessus
   const [pos] = useState(() => Object.fromEntries(wins.map((w) => [w.id, w.pos()])))
 
@@ -60,7 +60,7 @@ export default function App() {
 
   return (
     <>
-      <Liquid />
+      <Background />
 
       <div className="intro">
         <h1>{profile.name}</h1>
