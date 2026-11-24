@@ -1,11 +1,11 @@
 // Modifie ces données pour personnaliser ton portfolio.
 export const profile = {
-  name: 'Ton Nom',
+  name: 'Bastien Flahaut',
   title: 'Développeur Full-Stack',
   bio: "Je conçois et développe des applications web modernes, performantes et accessibles.",
-  email: 'ton.email@example.com',
+  email: 'bastien.flahaut@gmail.com',
   github: 'https://github.com/Bastinouuuu',
-  linkedin: 'https://linkedin.com/in/ton-profil',
+  linkedin: 'https://www.linkedin.com/in/bastien-flahaut/',
 }
 
 export const skills = ['JavaScript', 'TypeScript', 'React', 'Node.js', 'Python', 'SQL', 'Git', 'Docker']
